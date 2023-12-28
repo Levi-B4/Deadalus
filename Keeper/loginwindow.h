@@ -25,6 +25,12 @@ public slots:
     // may impliment a checker to verify before displaying
     // Ex: 10 char string at the beginning of all keys to validate
 
+    // select key location
+    void HandleFileSelectionButtonPressed();
+
+    // create new key and credentials
+    void HandleResetCredentialsButtonPressed();
+
     // read key and decrypt login credentials
     void HandleSubmitKeyPressed();
 
@@ -32,6 +38,7 @@ private:
     // pointer to window ui
     Ui::LoginWindow *ui;
 
+    // connects signals and slots for login window
     void ConnectSlots();
 };
 #endif // LOGINWINDOW_H

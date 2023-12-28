@@ -1,4 +1,5 @@
 #include "loginwindow.h"
+#include "credentialswindow.h"
 
 #include <QApplication>
 
@@ -8,10 +9,12 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     // create login window
-    LoginWindow w;
+    LoginWindow login;
+    CredentialsWindow credentials;
 
     // display login window
-    w.show();
+    login.show();
+    credentials.show();
 
     // execute application logic
     return app.exec();

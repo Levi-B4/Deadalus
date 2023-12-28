@@ -38,6 +38,9 @@ else()
     else()
         add_executable(Keeper
             ${PROJECT_SOURCES}
+            CipherTool/CipherTool.cpp
+            CipherTool/CipherTool.h
+            credentialswindow.h credentialswindow.cpp credentialswindow.ui
         )
     endif()
 endif()
