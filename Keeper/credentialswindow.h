@@ -25,7 +25,7 @@ public slots:
     void AddCredential();
 
     // remove row from list
-    void RemoveCredential(int id);
+    void RemoveCredential();
 
 private:
     Ui::CredentialsWindow *ui;
@@ -41,7 +41,7 @@ private:
     void LoadCredentials();
 
     // display credentials to gui
-    void DisplayCredentials();
+    void DisplayCredentials(int startingIndex);
 
     void ConnectRemoveButton(QPushButton* button);
 
