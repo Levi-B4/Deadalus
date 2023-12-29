@@ -31,6 +31,18 @@ CredentialsWindow::~CredentialsWindow()
     delete ui;
 
     delete layout;
+
+    delete buttons.button(-2);
+
+    for(int i = 0; i < credentials.size(); i++){
+        delete buttons.button(i);
+    }
+
+    for(QVector<QWidget*> row : qAsConst(credentials)){
+        for(QWidget* widget : qAsConst(row)){
+            delete widget;
+        }
+    }
 }
 
 // display credentials from readable resource file

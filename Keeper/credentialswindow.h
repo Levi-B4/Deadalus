@@ -36,15 +36,19 @@ private:
     // QButtonGroup of buttons to remove a row
     QButtonGroup buttons;
 
+    // layout for the window
     QGridLayout* layout;
 
+    // loads saved credentials and displays buttons
     void LoadCredentials();
 
     // display credentials to gui
     void DisplayCredentials(int startingIndex);
 
+    // connects a button to the RemoveCredential slot
     void ConnectRemoveButton(QPushButton* button);
 
+// may remove as it is redundant of CipherTool class
     void DecryptCredentials(QString keyPath);
 };
 
