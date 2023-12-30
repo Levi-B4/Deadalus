@@ -43,7 +43,6 @@ void LoginWindow::HandleResetCredentialsButtonPressed(){
 
             break;
         case QMessageBox::Cancel:
-
             break;
         default:
             // should not be reached
@@ -61,45 +60,49 @@ void LoginWindow::HandleSubmitKeyPressed(){
         return;
     }
 
-    // display credential window passing key path
+    // creates credentials window passing the file path
+    credentials = new CredentialsWindow(ui->filePath->toPlainText());
+    credentials->show();
+
+    // closes login window
+    close();
 }
 
 // connects signals and slots for window
 void LoginWindow::ConnectSlots(){
-
-    // connects the
+    // connects file select button to its handler
     connect(
         // object emitting signal
         ui->fileSelectButton,
         // signal type
-        SIGNAL(clicked()),
+        &QPushButton::clicked,
         // object which owns slot
         this,
         // slot recieving signal
-        SLOT(HandleFileSelectionButtonPressed())
+        &LoginWindow::HandleFileSelectionButtonPressed
     );
 
-    // connects the createCredentials button to the HandleCredentialsButtonPressed function
+    // connects the createCredentials button to its handler
     connect(
         // object emitting signal
         ui->resetCredentialsButton,
         // signal type
-        SIGNAL(clicked()),
+        &QPushButton::clicked,
         // object which owns slot
         this,
         // slot recieving signal
-        SLOT(HandleResetCredentialsButtonPressed())
+        &LoginWindow::HandleResetCredentialsButtonPressed
         );
 
-    // connects the submit button to the HandleSubmitKeyPressed function
+    // connects the submit button to its handler
     connect(
         // object emitting signal
         ui->submitButton,
         // signal type
-        SIGNAL(clicked()),
+        &QPushButton::clicked,
         // object which owns slot
         this,
         // slot recieving signal
-        SLOT(HandleSubmitKeyPressed())
+        &LoginWindow::HandleSubmitKeyPressed
     );
 }

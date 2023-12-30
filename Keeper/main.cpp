@@ -10,11 +10,11 @@ int main(int argc, char *argv[])
 
     // create login window
     LoginWindow login;
-    CredentialsWindow credentials;
+//    CredentialsWindow credentials;
 
     // display login window
     login.show();
-    credentials.show();
+    //credentials.show();
 
     // execute application logic
     return app.exec();

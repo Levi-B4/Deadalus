@@ -1,6 +1,8 @@
 #ifndef LOGINWINDOW_H
 #define LOGINWINDOW_H
 
+#include "credentialswindow.h"
+
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
@@ -34,6 +36,8 @@ public slots:
 private:
     // pointer to window ui
     Ui::LoginWindow *ui;
+
+    CredentialsWindow* credentials;
 
     // connects signals and slots for login window
     void ConnectSlots();

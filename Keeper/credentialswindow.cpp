@@ -5,6 +5,7 @@
 
 #include <iostream>
 
+#include <QString>
 #include <QWidget>
 #include <QGridLayout>
 #include <QLineEdit>
@@ -13,12 +14,14 @@
 #include <QWidget>
 #include <QTableWidget>
 
-CredentialsWindow::CredentialsWindow(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::CredentialsWindow)
+CredentialsWindow::CredentialsWindow(QString keyPath/*, QString sourcePath*/)
+    : ui(new Ui::CredentialsWindow)
 {
     // creates window ui
     ui->setupUi(this);
+
+    // creates cipher tool using filePath
+    cipher = new CipherTool(keyPath.toStdString());
 
     // create window layout as a grid
     layout = new QGridLayout(this);

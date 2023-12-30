@@ -3,6 +3,7 @@
 
 #include "CipherTool/CipherTool.h"
 
+#include <QString>
 #include <QWidget>
 #include <QButtonGroup>
 #include <QGridLayout>
@@ -18,8 +19,8 @@ class CredentialsWindow : public QWidget
     Q_OBJECT
 
 public:
-    // constructor - parameters: QWidget* parent = nullptr
-    explicit CredentialsWindow(QWidget *parent = nullptr);
+    // constructor - parameters: QString filePath
+    explicit CredentialsWindow(QString filePath);
     ~CredentialsWindow();
 
 public slots:
