@@ -3,22 +3,19 @@
 #include <fstream>
 #include <string>
 
-using namespace std;
+// constructor - params: string filePath
+CipherTool::CipherTool(string filePath){
+    // open file
+    std::ifstream inputFile;
+    inputFile.open(filePath);
 
-// default constructor
-CipherTool::CipherTool(string filePath)
-{
-	// open file
-	ifstream inputFile;
-    inputFile.open("string filePath");
+    // read data
+    for(int i = FIRST_PRINTABLE_ASCII; i < LAST_STANDARD_ASCII; i++){
+        inputFile >> codeArray[i - FIRST_PRINTABLE_ASCII];
+    }
 
-	// read data
-	for(int i = FIRST_PRINTABLE_ASCII; i < LAST_STANDARD_ASCII; i++){
-		inputFile >> codeChar[i - FIRST_PRINTABLE_ASCII];
-	}
-
-	// close file
-	inputFile.close();
+    // close file
+    inputFile.close();
 }
 
 // encodes string and returns encoded string
@@ -33,7 +30,7 @@ string CipherTool::Encode(string startString){
 		ascii = startString[i];
 
 		// get the new replacement char
-		newChar = codeChar[ascii - FIRST_PRINTABLE_ASCII];	
+        newChar = codeArray[ascii - FIRST_PRINTABLE_ASCII];
 
 		// concatenate it onto the end of the new string
 		newString += newChar;
@@ -54,7 +51,7 @@ string CipherTool::Decode(string startString){
 		nextChar = startString[i];
 
 		// find char in the array and return its index
-		index = FindChar(codeChar, size, nextChar);
+        index = FindChar(codeArray, size, nextChar);
 
 		// get the original char by computing its ASCII code
 		originalChar = index + FIRST_PRINTABLE_ASCII;
@@ -65,13 +62,13 @@ string CipherTool::Decode(string startString){
 	return decodedText;
 }
 
-// performs linear search on a char string
-int CipherTool::FindChar(char charArrayPH[], int size, char value){
+// performs linear search on a char array to find the index of a char value
+int CipherTool::FindChar(char source[], int size, char value){
 	
 	for(int i = 0; i < size; i++)
 	{
 		// if found return its index
-		if(charArrayPH[i] == value)
+        if(source[i] == value)
 		{
 			return i;
 		}
@@ -79,3 +76,6 @@ int CipherTool::FindChar(char charArrayPH[], int size, char value){
 	// return -1, if not found
 	return -1;
 }
+
+
+// creates key in a designated file

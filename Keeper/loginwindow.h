@@ -22,9 +22,6 @@ public:
     ~LoginWindow();
 
 public slots:
-    // may impliment a checker to verify before displaying
-    // Ex: 10 char string at the beginning of all keys to validate
-
     // select key location
     void HandleFileSelectionButtonPressed();
 

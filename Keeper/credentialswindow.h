@@ -1,6 +1,8 @@
 #ifndef CREDENTIALSWINDOW_H
 #define CREDENTIALSWINDOW_H
 
+#include "CipherTool/CipherTool.h"
+
 #include <QWidget>
 #include <QButtonGroup>
 #include <QGridLayout>
@@ -21,13 +23,14 @@ public:
     ~CredentialsWindow();
 
 public slots:
-    // add row for credentials to list
+    // add row for credentials to ui
     void AddCredential();
 
-    // remove row from list
-    void RemoveCredential();
+    // removes a row
+    void RemoveRow();
 
 private:
+    // pointer to window ui
     Ui::CredentialsWindow *ui;
 
     // Array of rows of credentials
@@ -39,17 +42,17 @@ private:
     // layout for the window
     QGridLayout* layout;
 
-    // loads saved credentials and displays buttons
+    // cipher tool used to encode and decode data
+    CipherTool* cipher;
+
+    // load and display credentials from resource file
     void LoadCredentials();
 
-    // display credentials to gui
+    // display credentials - param: int startingIndex
     void DisplayCredentials(int startingIndex);
 
     // connects a button to the RemoveCredential slot
     void ConnectRemoveButton(QPushButton* button);
-
-// may remove as it is redundant of CipherTool class
-    void DecryptCredentials(QString keyPath);
 };
 
 #endif // CREDENTIALSWINDOW_H
