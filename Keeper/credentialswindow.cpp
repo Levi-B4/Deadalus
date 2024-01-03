@@ -3,8 +3,6 @@
 
 #include "CipherTool/CipherTool.h"
 
-#include <iostream>
-
 #include <QString>
 #include <QWidget>
 #include <QGridLayout>
@@ -154,7 +152,7 @@ void CredentialsWindow::LoadCredentials(){
         &QPushButton::clicked,
         this,
         &CredentialsWindow::AddCredential
-    );
+        );
 
     // display credentials starting at the first row
     DisplayCredentials(0);
@@ -177,5 +175,5 @@ void CredentialsWindow::ConnectRemoveButton(QPushButton* button){
         &QPushButton::clicked,
         this,
         &CredentialsWindow::RemoveRow
-    );
+        );
 }

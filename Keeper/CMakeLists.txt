@@ -14,9 +14,9 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
         main.cpp
-        loginwindow.cpp
-        loginwindow.h
-        loginwindow.ui
+
+
+
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -41,6 +41,12 @@ else()
             CipherTool/CipherTool.cpp
             CipherTool/CipherTool.h
             credentialswindow.h credentialswindow.cpp credentialswindow.ui
+
+            test.h test.cpp test.ui
+            loginwindow.h loginwindow.cpp loginwindow.ui
+
+
+
         )
     endif()
 endif()

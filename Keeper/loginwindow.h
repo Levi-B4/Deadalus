@@ -4,6 +4,10 @@
 #include "credentialswindow.h"
 
 #include <QMainWindow>
+#include <QVBoxLayout>
+#include <QVector>
+
+#include <QGridLayout>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -24,8 +28,11 @@ public:
     ~LoginWindow();
 
 public slots:
+    // select source location
+    void HandleSourceFileExplore();
+
     // select key location
-    void HandleFileSelectionButtonPressed();
+    void HandleKeyFileExplore();
 
     // create new key and credentials
     void HandleResetCredentialsButtonPressed();
@@ -34,10 +41,25 @@ public slots:
     void HandleSubmitKeyPressed();
 
 private:
-    // pointer to window ui
+    // login window ui
     Ui::LoginWindow *ui;
 
+    // central widget
+    QWidget* centralWidget;
+
+    // layout for the ui
+    QVBoxLayout* layout;
+
+    // array of QWidgets, grouped by section of ui
+    QVector<QWidget*> sourceFileWidgets;
+    QVector<QWidget*> keyFileWidgets;
+    QVector<QWidget*> submissionWidgets;
+
+    // window to display credentials
     CredentialsWindow* credentials;
+
+    // displays ui
+    void DisplayUI();
 
     // connects signals and slots for login window
     void ConnectSlots();
