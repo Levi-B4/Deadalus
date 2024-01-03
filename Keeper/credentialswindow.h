@@ -20,7 +20,7 @@ class CredentialsWindow : public QWidget
 
 public:
     // constructor - parameters: QString filePath
-    explicit CredentialsWindow(QString filePath);
+    explicit CredentialsWindow(QString sourcePath, QString keyPath);
     ~CredentialsWindow();
 
 public slots:

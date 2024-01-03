@@ -12,13 +12,15 @@
 #include <QWidget>
 #include <QTableWidget>
 
-CredentialsWindow::CredentialsWindow(QString keyPath/*, QString sourcePath*/)
+CredentialsWindow::CredentialsWindow(QString sourcePath, QString keyPath)
     : ui(new Ui::CredentialsWindow)
 {
     // creates window ui
     ui->setupUi(this);
 
-    // creates cipher tool using filePath
+    setWindowTitle("Keyper Credentials");
+
+    // creates cipher tool, passing in key path
     cipher = new CipherTool(keyPath.toStdString());
 
     // create window layout as a grid

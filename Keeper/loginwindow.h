@@ -35,10 +35,10 @@ public slots:
     void HandleKeyFileExplore();
 
     // create new key and credentials
-    void HandleResetCredentialsButtonPressed();
+    void HandleNewCredentials();
 
     // read key and decrypt login credentials
-    void HandleSubmitKeyPressed();
+    void HandleSubmitPressed();
 
 private:
     // login window ui
@@ -63,5 +63,8 @@ private:
 
     // connects signals and slots for login window
     void ConnectSlots();
+
+    // verifies new file creation
+    bool CreateFile(QString FilePath);
 };
 #endif // LOGINWINDOW_H

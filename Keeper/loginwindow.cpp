@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QLabel>
 #include <QLineEdit>
@@ -20,6 +21,8 @@ LoginWindow::LoginWindow(QWidget *parent)
 {
     // creates ui object
     ui->setupUi(this);
+
+    setWindowTitle("Keyper Login");
 
     // create central widget
     //(main window must use a central widget for its layout)
@@ -61,37 +64,55 @@ void LoginWindow::HandleKeyFileExplore(){
     }
 }
 
-void LoginWindow::HandleResetCredentialsButtonPressed(){
-    QMessageBox resetWarning;
-    resetWarning.setText("This will delete any currently saved credentials");
-    resetWarning.setInformativeText("Would you like to continue?");
-    resetWarning.setStandardButtons(QMessageBox::Ok| QMessageBox::Cancel);
+void LoginWindow::HandleNewCredentials(){
+    // create dialog for selecting a directory
+    QFileDialog selectDirectory;
+    selectDirectory.setFileMode(QFileDialog::Directory);
+    selectDirectory.setOption(QFileDialog::ShowDirsOnly);
+    selectDirectory.setWindowTitle("Select Target Directory");
 
-    switch(resetWarning.exec()){
-    case QMessageBox::Ok:
+    // get a directory for creating the new source and key files
+    QString targetDirectory = selectDirectory.getExistingDirectory(this);
 
-        break;
-    case QMessageBox::Cancel:
-        break;
-    default:
-        // should not be reached
-        break;
+    // get input for source file name
+    QString sourceNameInput = QInputDialog::getText(this,"New Source File Name","Name the new Source File: ");
+    QString sourcePath= targetDirectory + "/" + sourceNameInput;
+
+    // create source file and return if file can't be created
+    if(!CreateFile(sourcePath)){
+        return;
     }
 
-    // decrypt encrypted resource file to readable resource file
+    // get input for key file name
+    QString keyNameInput = QInputDialog::getText(this,"New Key File Name","Name the new Key File: ");
+    QString keyPath = targetDirectory + "/" + keyNameInput;
 
-    // show credentials
+    // create source file and return if file can't be created
+    if(!CreateFile(keyPath)){
+        return;
+    }
+
+    // creates credentials window passing the file path
+    credentials = new CredentialsWindow(sourcePath, keyPath);
+
+    credentials->show();
+
+    // hides login window
+    close();
 }
 
 // read key and decrypt login credentials
-void LoginWindow::HandleSubmitKeyPressed(){
+void LoginWindow::HandleSubmitPressed(){
     if(qobject_cast<QLineEdit*>(sourceFileWidgets[1])->displayText() == ""
         || qobject_cast<QLineEdit*>(keyFileWidgets[1])->displayText() == ""){
         return;
     }
 
-    // creates credentials window passing the file path
-    credentials = new CredentialsWindow(qobject_cast<QLineEdit*>(sourceFileWidgets[1])->displayText());
+    // creates credentials window passing the source path and key path
+    credentials = new CredentialsWindow(
+        qobject_cast<QLineEdit*>(sourceFileWidgets[1])->displayText(),
+        qobject_cast<QLineEdit*>(keyFileWidgets[1])->displayText()
+    );
     credentials->show();
 
     // hides login window
@@ -124,6 +145,7 @@ void LoginWindow::DisplayUI(){
     }
     layout->addLayout(keyLayout);
 
+    submissionWidgets.push_back(new QPushButton("New Credentials"));
     submissionWidgets.push_back(new QPushButton("submit"));
     // add submission widgets to layout
     QHBoxLayout* submissionLayout = new QHBoxLayout(this);
@@ -159,8 +181,7 @@ void LoginWindow::ConnectSlots(){
         &LoginWindow::HandleKeyFileExplore
     );
 
-    //crashes, something with the signal or emitter i think
-    // connects the submit button to its handler
+    // cennects the new credentials button to its handler
     connect(
         // object emitting signal
         qobject_cast<QPushButton*>(submissionWidgets[0]),
@@ -169,6 +190,56 @@ void LoginWindow::ConnectSlots(){
         // object which owns slot
         this,
         // slot recieving signal
-        &LoginWindow::HandleSubmitKeyPressed
+        &LoginWindow::HandleNewCredentials
     );
+
+    // connects the submit button to its handler
+    connect(
+        // object emitting signal
+        qobject_cast<QPushButton*>(submissionWidgets[1]),
+        // signal type
+        &QPushButton::clicked,
+        // object which owns slot
+        this,
+        // slot recieving signal
+        &LoginWindow::HandleSubmitPressed
+    );
+}
+
+// checks if file can be created, prompting user for input if file will be overwritten
+bool LoginWindow::CreateFile(QString filePath){
+    //
+    QFile newFile(filePath);
+
+    if(newFile.exists()){
+        // create message box
+        QMessageBox fileExistsMessage(this);
+
+        // create message ui
+        fileExistsMessage.setText("This file already exists, would you like to overwrite it?");
+
+        fileExistsMessage.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+        switch(fileExistsMessage.exec()){
+            case QMessageBox::YesRole:
+                newFile.resize(0);
+                break;
+
+            case QMessageBox::NoRole:
+                return false;
+                break;
+        }
+    }
+
+    if(newFile.open(QIODevice::ReadOnly)){
+        newFile.close();
+        return true;
+    } else {
+        QMessageBox cannotCreateFileMessage(this);
+        cannotCreateFileMessage.setText("File cannot be created, create it manually then try again");
+
+        cannotCreateFileMessage.setStandardButtons(QMessageBox::Ok);
+        cannotCreateFileMessage.exec();
+        return false;
+    }
 }

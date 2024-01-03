@@ -42,7 +42,7 @@ else()
             CipherTool/CipherTool.h
             credentialswindow.h credentialswindow.cpp credentialswindow.ui
 
-            test.h test.cpp test.ui
+
             loginwindow.h loginwindow.cpp loginwindow.ui
 
 
