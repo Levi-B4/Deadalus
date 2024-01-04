@@ -11,6 +11,7 @@
 #include <QButtonGroup>
 #include <QWidget>
 #include <QTableWidget>
+#include <QLabel>
 
 CredentialsWindow::CredentialsWindow(QString sourcePath, QString keyPath)
     : ui(new Ui::CredentialsWindow)
@@ -25,9 +26,22 @@ CredentialsWindow::CredentialsWindow(QString sourcePath, QString keyPath)
 
     // create window layout as a grid
     layout = new QGridLayout(this);
+    layout->setAlignment(Qt::AlignTop);
+    layout->setVerticalSpacing(5);
 
     // load credentials from resource file
     LoadCredentials();
+
+    // chart labels
+    QVector<QLabel*> tempLabelVector;
+    tempLabelVector.push_back(new QLabel("Website"));
+    tempLabelVector.push_back(new QLabel("Username"));
+    tempLabelVector.push_back(new QLabel("Password"));
+
+    for(int i = 0; i < tempLabelVector.size(); i++){
+        tempLabelVector[i]->setMaximumHeight(30);
+        layout->addWidget(tempLabelVector[i], 0, i);
+    }
 }
 
 CredentialsWindow::~CredentialsWindow()
@@ -40,10 +54,10 @@ CredentialsWindow::~CredentialsWindow()
     delete cipher;
 
     // delete "+" button
-    delete buttons.button(-2);
+    delete buttons.button(-1);
 
     // delete all "-" buttons
-    for(int i = 0; i < credentials.size(); i++){
+    for(int i = -1; i < credentials.size(); i++){
         delete buttons.button(i);
     }
 
@@ -66,22 +80,17 @@ void CredentialsWindow::AddCredential(){
         row.push_back(new QLineEdit());
     }
 
-    // remove "+" button from layout
-    layout->removeWidget(buttons.button(-2));
-
     // add new "-" button to and add on click function for row removal
     buttons.addButton(new QPushButton("-"), credentials.size());
-    layout->addWidget(buttons.button(credentials.size()), credentials.size(), 3);
     ConnectRemoveButton(qobject_cast<QPushButton*>(buttons.button(credentials.size())));
+
+    // display remove button
+    layout->addWidget(buttons.button(credentials.size()), credentials.size() + 1, 3);
 
     // add row to credentials vector
     credentials.push_back(row);
 
-    // display now row
     DisplayCredentials(credentials.size() - 1);
-
-    // place "+" button at bottom of grid
-    layout->addWidget(buttons.button(-2), credentials.size() + 1, 0, 1, 4);
 }
 
 // removes a row
@@ -101,19 +110,12 @@ void CredentialsWindow::RemoveRow(){
     // remove row from credentials vector
     credentials.remove(id);
 
-    // remove following rows credentials from layout
-    for(int i = id; i < credentials.size(); i++){
-        for(QWidget* credentialEntry : qAsConst(credentials[i])){
-            layout->removeWidget(credentialEntry);
-        }
-    }
-
     // identify last remove button
     QPushButton* buttonToDelete = qobject_cast<QPushButton*>(buttons.button(credentials.size()));
 
-    // remove last button from layout
+    // remove last remove button from layout
     layout->removeWidget(buttonToDelete);
-    // remove last button from button group
+    // remove last remove button from button group
     buttons.removeButton(buttonToDelete);
     // delete removed button
     delete buttonToDelete;
@@ -138,23 +140,35 @@ void CredentialsWindow::LoadCredentials(){
 
         // create button to remove row on click
         buttons.addButton(new QPushButton("-"), i);
-        layout->addWidget(buttons.button(i), i, 3);
+        layout->addWidget(buttons.button(i), i + 1, 3);
 
         // implement onlick for "-" buttons
         ConnectRemoveButton(qobject_cast<QPushButton*>(buttons.button(i)));
     }
 
     // create button for adding rows
-    buttons.addButton(new QPushButton("+"), -2);
-    layout->addWidget(buttons.button(-2), credentials.size(), 0, 1, 4);
+    buttons.addButton(new QPushButton("+"), -1);
+    layout->addWidget(buttons.button(-1), credentials.size(), 0, 1, 4);
 
     // implement onlick for "+" button
     connect(
-        buttons.button(-2),
+        buttons.button(-1),
         &QPushButton::clicked,
         this,
         &CredentialsWindow::AddCredential
-        );
+    );
+
+    // create button for saving credentials to file
+    buttons.addButton(new QPushButton("Save"), -2);
+
+    // implement saving for "Save" button
+    // connect();
+
+    // create button for clearing all credentials
+    buttons.addButton(new QPushButton("Clear"), -3);
+
+    // implement clearing for "clear" button
+    // connect();
 
     // display credentials starting at the first row
     DisplayCredentials(0);
@@ -165,9 +179,18 @@ void CredentialsWindow::DisplayCredentials(int startingIndex){
     // iterate through each row starting at startingIndex and add them to the layout
     for(int i = startingIndex; i < credentials.size(); i++){
         for(int j = 0; j < credentials[0].size(); j++){
-            layout->addWidget(credentials[i][j], i, j);
+            layout->addWidget(credentials[i][j], i + 1, j);
         }
     }
+
+    layout->removeWidget(buttons.button(-1));
+    layout->addWidget(buttons.button(-1), credentials.size() + 1, 0, 1, 4);
+
+    for(int i = -2; buttons.button(i) != nullptr; i--){
+        layout->removeWidget(buttons.button(i));
+        layout->addWidget(buttons.button(i), credentials.size() + 2, (i * -1) - 2);
+    }
+
 }
 
 // connects a button to the RemoveCredential slot

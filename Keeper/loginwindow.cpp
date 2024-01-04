@@ -22,16 +22,20 @@ LoginWindow::LoginWindow(QWidget *parent)
     // creates ui object
     ui->setupUi(this);
 
+    // set window title
     setWindowTitle("Keyper Login");
 
     // create central widget
-    //(main window must use a central widget for its layout)
     centralWidget = new QWidget();
     setCentralWidget(centralWidget);
 
     // create window layout
     layout = new QVBoxLayout();
     centralWidget->setLayout(layout);
+
+    // format layout alignment and spacing
+    layout->setAlignment(Qt::AlignCenter);
+    layout->setSpacing(5);
 
     // display ui
     DisplayUI();
@@ -124,7 +128,8 @@ void LoginWindow::DisplayUI(){
     // create widgets for source file
     sourceFileWidgets.push_back(new QLabel("Source File: "));
     sourceFileWidgets.push_back(new QLineEdit());
-    sourceFileWidgets.push_back(new QPushButton("Explore..."));centralWidget;
+    sourceFileWidgets.push_back(new QPushButton("Explore..."));
+    centralWidget;
 
     // add source file widgets to layout
     QHBoxLayout* sourceLayout = new QHBoxLayout(this);
@@ -236,7 +241,7 @@ bool LoginWindow::CreateFile(QString filePath){
         return true;
     } else {
         QMessageBox cannotCreateFileMessage(this);
-        cannotCreateFileMessage.setText("File cannot be created, create it manually then try again");
+        cannotCreateFileMessage.setText("File cannot be created, create it manually then try again. This is most likely a permissions error.");
 
         cannotCreateFileMessage.setStandardButtons(QMessageBox::Ok);
         cannotCreateFileMessage.exec();
