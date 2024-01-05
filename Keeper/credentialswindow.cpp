@@ -3,6 +3,10 @@
 
 #include "CipherTool/CipherTool.h"
 
+#include <QFile>
+#include <QTextStream>
+#include <QMessageBox>
+
 #include <QString>
 #include <QWidget>
 #include <QGridLayout>
@@ -13,7 +17,7 @@
 #include <QTableWidget>
 #include <QLabel>
 
-CredentialsWindow::CredentialsWindow(QString sourcePath, QString keyPath)
+CredentialsWindow::CredentialsWindow(QString sourcePath, QString keyPath, bool isNewCredentials)
     : ui(new Ui::CredentialsWindow)
 {
     // creates window ui
@@ -23,6 +27,14 @@ CredentialsWindow::CredentialsWindow(QString sourcePath, QString keyPath)
 
     // creates cipher tool, passing in key path
     cipher = new CipherTool(keyPath.toStdString());
+
+    // set source file path
+    this->sourcePath = sourcePath;
+
+    // creates a new key inside keyPath file
+    if(isNewCredentials){
+        cipher->CreateNewKey();
+    }
 
     // create window layout as a grid
     layout = new QGridLayout(this);
@@ -62,9 +74,9 @@ CredentialsWindow::~CredentialsWindow()
     }
 
     // delete all credential LineEdits
-    for(QVector<QWidget*> row : qAsConst(credentials)){
-        for(QWidget* widget : qAsConst(row)){
-            delete widget;
+    for(QVector<QLineEdit*> row : qAsConst(credentials)){
+        for(QLineEdit* lineEdit : qAsConst(row)){
+            delete lineEdit;
         }
     }
 }
@@ -73,7 +85,7 @@ CredentialsWindow::~CredentialsWindow()
 void CredentialsWindow::AddCredential(){
 
     // create vector to hold row widgets
-    QVector<QWidget*> row;
+    QVector<QLineEdit*> row;
 
     // add widgets to row vector
     for(int i = 0; i < 3; i++){
@@ -103,9 +115,9 @@ void CredentialsWindow::RemoveRow(){
     int id = buttons.id(button);
 
     // remove row from layout
-    for(QWidget* widget : qAsConst(credentials[id])){
-        layout->removeWidget(widget);
-        delete widget;
+    for(QLineEdit* lineEdit : qAsConst(credentials[id])){
+        layout->removeWidget(lineEdit);
+        delete lineEdit;
     }
     // remove row from credentials vector
     credentials.remove(id);
@@ -124,18 +136,30 @@ void CredentialsWindow::RemoveRow(){
     DisplayCredentials(id);
 }
 
+// saves all credentials to source file, encoded with cipher and key file
+void CredentialsWindow::Save(){
+    QFile sourceFile(sourcePath);
+
+    if(sourceFile.open(QIODevice::ReadWrite)){
+        QTextStream stream(&sourceFile);
+        stream << QString::fromStdString(cipher->Encode(credentials[0][0]->text().toStdString()));
+    }
+
+    sourceFile.close();
+}
+
 // load and display credentials from resource file
 void CredentialsWindow::LoadCredentials(){
     // change i < 5 to resourceFile.hasNextLine()
     for(int i = 0; i < 5; i++){
         // create vector of row and add to credential array
-        QVector<QWidget*> row;
+        QVector<QLineEdit*> row;
         credentials.push_back(row);
 
         // iterate through line and add credentials to row as line edits
         for(int j = 0; j < 3; j++){
             credentials[i].push_back(new QLineEdit());
-            qobject_cast<QLineEdit*>(credentials[i][j])->setText("W/U/S");
+            credentials[i][j]->setText("W/U/S");
         }
 
         // create button to remove row on click
@@ -144,6 +168,24 @@ void CredentialsWindow::LoadCredentials(){
 
         // implement onlick for "-" buttons
         ConnectRemoveButton(qobject_cast<QPushButton*>(buttons.button(i)));
+    }
+
+    QFile sourceFile(sourcePath);
+
+    if(!sourceFile.open(QIODevice::ReadOnly)){
+        QMessageBox::critical(
+            this,
+            tr("Keyper"),
+            tr("Could not open source file!")
+        );
+    } else{
+        QTextStream in(&sourceFile);
+
+        while(!in.atEnd()){
+            QString line = in.readLine();
+            //QStringList fields = line.split(",");
+            credentials[0][0]->setText(QString::fromStdString(cipher->Decode(line.toStdString())));
+        }
     }
 
     // create button for adding rows
@@ -162,7 +204,12 @@ void CredentialsWindow::LoadCredentials(){
     buttons.addButton(new QPushButton("Save"), -2);
 
     // implement saving for "Save" button
-    // connect();
+    connect(
+        buttons.button(-2),
+        &QPushButton::clicked,
+        this,
+        &CredentialsWindow::Save
+    );
 
     // create button for clearing all credentials
     buttons.addButton(new QPushButton("Clear"), -3);

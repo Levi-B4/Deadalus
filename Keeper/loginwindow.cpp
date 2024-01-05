@@ -97,7 +97,7 @@ void LoginWindow::HandleNewCredentials(){
     }
 
     // creates credentials window passing the file path
-    credentials = new CredentialsWindow(sourcePath, keyPath);
+    credentials = new CredentialsWindow(sourcePath, keyPath, true);
 
     credentials->show();
 

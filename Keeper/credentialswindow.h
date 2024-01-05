@@ -8,6 +8,7 @@
 #include <QButtonGroup>
 #include <QGridLayout>
 #include <QPushButton>
+#include <QLineEdit>
 
 namespace Ui {
 class CredentialsWindow;
@@ -20,7 +21,7 @@ class CredentialsWindow : public QWidget
 
 public:
     // constructor - parameters: QString filePath
-    explicit CredentialsWindow(QString sourcePath, QString keyPath);
+    explicit CredentialsWindow(QString sourcePath, QString keyPath, bool IsNewCredentials = false);
     ~CredentialsWindow();
 
 public slots:
@@ -30,12 +31,15 @@ public slots:
     // removes a row
     void RemoveRow();
 
+    // saves all credentials to source file, encoded with cipher and key file
+    void Save();
+
 private:
     // pointer to window ui
     Ui::CredentialsWindow *ui;
 
     // Array of rows of credentials
-    QVector< QVector< QWidget* > > credentials;
+    QVector< QVector< QLineEdit* > > credentials;
 
     // QButtonGroup of buttons to remove a row
     QButtonGroup buttons;
@@ -45,6 +49,9 @@ private:
 
     // cipher tool used to encode and decode data
     CipherTool* cipher;
+
+    // path to file containing source of credentials
+    QString sourcePath;
 
     // load and display credentials from resource file
     void LoadCredentials();
