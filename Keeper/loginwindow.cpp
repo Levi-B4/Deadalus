@@ -99,10 +99,11 @@ void LoginWindow::HandleNewCredentials(){
     // creates credentials window passing the file path
     credentials = new CredentialsWindow(sourcePath, keyPath, true);
 
+    // will need to delete ptr, save to var and delete on class delete
     credentials->show();
 
     // hides login window
-    close();
+    hide();
 }
 
 // read key and decrypt login credentials

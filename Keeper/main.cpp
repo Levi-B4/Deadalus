@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
     // display login window
     login.show();
 
+
     // execute application logic
     return app.exec();
 }

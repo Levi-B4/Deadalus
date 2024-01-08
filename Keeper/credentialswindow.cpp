@@ -139,28 +139,88 @@ void CredentialsWindow::RemoveRow(){
 // saves all credentials to source file, encoded with cipher and key file
 void CredentialsWindow::Save(){
     QFile sourceFile(sourcePath);
+    QString input = "";
+    QString line;
+    bool startOfLine;
 
-    if(sourceFile.open(QIODevice::ReadWrite)){
+    // iterate through credentials and add them as a custom csv
+    // (using an escape character on commas)
+    if(sourceFile.open(QIODevice::WriteOnly | QIODevice::Text)){
         QTextStream stream(&sourceFile);
-        stream << QString::fromStdString(cipher->Encode(credentials[0][0]->text().toStdString()));
-    }
+        for(QVector<QLineEdit*> credential : qAsConst(credentials)){
+            startOfLine = true;
+            line = "";
+            for(QLineEdit* credentialInput : qAsConst(credential)){
+                // add comma if not at the start of a new line
+                if(!startOfLine){
+                    line += ",";
+                }
 
+                // get text from credential input
+                input = credentialInput->text();
+                // allows commas in data utilizing an escape character
+                input.replace("\\", "\\\\");
+                input.replace(",", "\\,");
+
+                // add input to total line value
+                line += input;
+
+                startOfLine = false;
+            }
+            // go to nextline after each credential
+            stream << QString::fromStdString(cipher->Encode(line.toStdString())) << "\r\n";
+        }
+    }
     sourceFile.close();
 }
 
 // load and display credentials from resource file
 void CredentialsWindow::LoadCredentials(){
-    // change i < 5 to resourceFile.hasNextLine()
-    for(int i = 0; i < 5; i++){
-        // create vector of row and add to credential array
-        QVector<QLineEdit*> row;
-        credentials.push_back(row);
+    QFile sourceFile(sourcePath);
 
-        // iterate through line and add credentials to row as line edits
-        for(int j = 0; j < 3; j++){
-            credentials[i].push_back(new QLineEdit());
-            credentials[i][j]->setText("W/U/S");
+    if(!sourceFile.open(QIODevice::ReadOnly)){
+        QMessageBox::critical(
+            this,
+            tr("Keyper"),
+            tr("Could not open source file!")
+        );
+        return;
+    }
+    QTextStream in(&sourceFile);
+
+    QString line;
+    QStringList credential;
+    credential.push_back("");
+    credential.push_back("");
+    credential.push_back("");
+
+    QVector<QLineEdit*> tempCredential;
+
+    for(int i = 0; !in.atEnd(); i++){
+        line = QString::fromStdString(cipher->Decode(in.readLine().toStdString()));
+        credential[0] = "";
+        credential[1] = "";
+        credential[2] = "";
+
+        int currentEntity = 0;
+        for(int j = 0; j < line.size(); j++){
+            if(line[j] == '\\'){
+                j++;
+            } else {
+                if(line[j] == ','){
+                    currentEntity++;
+                    continue;
+                }
+            }
+            credential[currentEntity] += line[j];
         }
+
+        tempCredential.clear();
+        for(int j = 0; j < credential.size(); j++){
+            tempCredential.push_back(new QLineEdit());
+            tempCredential[j]->setText(QString::fromStdString(credential[j].toStdString()));
+        }
+        credentials.push_back(tempCredential);
 
         // create button to remove row on click
         buttons.addButton(new QPushButton("-"), i);
@@ -170,22 +230,12 @@ void CredentialsWindow::LoadCredentials(){
         ConnectRemoveButton(qobject_cast<QPushButton*>(buttons.button(i)));
     }
 
-    QFile sourceFile(sourcePath);
-
-    if(!sourceFile.open(QIODevice::ReadOnly)){
-        QMessageBox::critical(
-            this,
-            tr("Keyper"),
-            tr("Could not open source file!")
-        );
-    } else{
-        QTextStream in(&sourceFile);
-
-        while(!in.atEnd()){
-            QString line = in.readLine();
-            //QStringList fields = line.split(",");
-            credentials[0][0]->setText(QString::fromStdString(cipher->Decode(line.toStdString())));
-        }
+    if(credentials.size() == 0){
+        QVector<QLineEdit*> PHCred;
+        PHCred.push_back(new QLineEdit());
+        PHCred.push_back(new QLineEdit());
+        PHCred.push_back(new QLineEdit());
+        credentials.push_back(PHCred);
     }
 
     // create button for adding rows
@@ -211,12 +261,6 @@ void CredentialsWindow::LoadCredentials(){
         &CredentialsWindow::Save
     );
 
-    // create button for clearing all credentials
-    buttons.addButton(new QPushButton("Clear"), -3);
-
-    // implement clearing for "clear" button
-    // connect();
-
     // display credentials starting at the first row
     DisplayCredentials(0);
 }
@@ -237,7 +281,6 @@ void CredentialsWindow::DisplayCredentials(int startingIndex){
         layout->removeWidget(buttons.button(i));
         layout->addWidget(buttons.button(i), credentials.size() + 2, (i * -1) - 2);
     }
-
 }
 
 // connects a button to the RemoveCredential slot
@@ -247,5 +290,5 @@ void CredentialsWindow::ConnectRemoveButton(QPushButton* button){
         &QPushButton::clicked,
         this,
         &CredentialsWindow::RemoveRow
-        );
+    );
 }
