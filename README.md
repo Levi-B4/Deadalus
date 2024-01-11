@@ -1,2 +1,2 @@
 # Keyper
-A place to keep passwords offline
+Keyper is a Qt application which utilizes encryption to store login credentials.
